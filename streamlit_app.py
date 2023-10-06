@@ -7,10 +7,10 @@ import streamlit as st
 
 import numpy as np
 import joblib
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import AdaBoostClassifier
 from prediction import get_prediction, ordinal_encoder
 
-model = joblib.load(r'MentalHealth.ipynb')
+model = joblib.load(r'MentalHealth.joblib')
 
 st.set_page_config(page_title="Students Mental Health Prediction App",
                    layout="wide")
