@@ -4,35 +4,79 @@ import math
 import pandas as pd
 import streamlit as st
 
-"""
-# Welcome to Streamlit!
 
-Edit `/streamlit_app.py` to customize this app to your heart's desire :heart:
+import numpy as np
+import joblib
+from sklearn.ensemble import RandomForestClassifier
+from prediction import get_prediction, ordinal_encoder
 
-If you have any questions, checkout our [documentation](https://docs.streamlit.io) and [community
-forums](https://discuss.streamlit.io).
+model = joblib.load(r'MentalHealth.ipynb')
 
-In the meantime, below is an example of what you can do with just a few lines of code:
-"""
+st.set_page_config(page_title="Students Mental Health Prediction App",
+                   , layout="wide")
+
+gender=['Male','Female']
+Age=['18.','19.','20.','21.','22.','23.','24,']
+course=['Engineering', 'religious', 'Arts', 'Law', 'Mathemathics',
+       'Home Science', 'CA', 'Human Resources', 'Music', 'Psychology',
+       'KENMS', 'Accounting ', 'ENM', 'Marine science', 'KOE',
+       'Banking Studies', 'Business Administration', 'Usuluddin ',
+       'TAASL', 'ALA', 'Biomedical science', 'Koe', 'BENL', 'CTS',
+       'Econs', 'MHSC', 'Malcom', 'Kop', 'Human Sciences ',
+       'Biotechnology', 'Communication ', 'Diploma Nursing',
+       'Pendidikan Islam ', 'Radiography', 'Fiqh', 'DIPLOMA TESL',
+       'Nursing ']
+year=['1','2','3','4']
+cgpa=['3.00 - 3.49', '3.50 - 4.00', '2.50 - 2.99', '2.00 - 2.49',
+       '0 - 1.99']
+martial=['Yes','No']
+depression=['Yes','No']
+anxiety=['Yes','No']
+panic=['Yes','No']
+treatment=['Yes','No']
+
+features = ['Gender','Age','Course','Year of Study','CGPA','Martial Status','Have depression?','Have any anxiety?','Had any panic attacks before?']
 
 
-with st.echo(code_location='below'):
-    total_points = st.slider("Number of points in spiral", 1, 5000, 2000)
-    num_turns = st.slider("Number of turns in spiral", 1, 100, 9)
+st.markdown("<h1 style='text-align: center;'color:red;'>Mental Health Predictor </h1>", unsafe_allow_html=True)
+def main():
+    with st.form('prediction_form'):
 
-    Point = namedtuple('Point', 'x y')
-    data = []
+        st.subheader("Enter the input for following :")
+        
+        gender = st.selectbox("Select your gender: ", option=gender)
+        age = st.selectbox("Select your age: ", options=age)
+        course = st.selectbox("Select your current pursuing course: ", options=course)
+        year = st.selectbox("Select your year of study: ", options=year)
+        cgpa = st.selectbox("Select CGPA score: ", options=cgpa)
+        martial = st.selectbox("Select your martial status: ", options=martial)
+        depression = st.selectbox("Do you have depression ", options=depression)
+        anxiety = st.selectbox("Have you experienced any anxiety lately? ", options=anxiety)
+        panic = st.selectbox("Had any panic attacks recently ? ", options=panic)
+        
+        
+        
+        submit = st.form_submit_button("Predict")
 
-    points_per_turn = total_points / num_turns
 
-    for curr_point_num in range(total_points):
-        curr_turn, i = divmod(curr_point_num, points_per_turn)
-        angle = (curr_turn + 1) * 2 * math.pi * i / points_per_turn
-        radius = curr_point_num / total_points
-        x = radius * math.cos(angle)
-        y = radius * math.sin(angle)
-        data.append(Point(x, y))
+    if submit:
+        gender = ordinal_encoder(gender ,gender)
+        age = ordinal_encoder(age,age)
+        course = ordinal_encoder(course,course)
+        year =  ordinal_encoder(year,year)
+        cgpa =  ordinal_encoder(cgpa,cgpa)
+        martial = ordinal_encoder(martial,martial) 
+        depression = ordinal_encoder(depression,depression)
+        anxiety=ordinal_encoder(anxiety,anxiety)
+        panic=ordinal_encoder(panic,panic)
 
-    st.altair_chart(alt.Chart(pd.DataFrame(data), height=500, width=500)
-        .mark_circle(color='#0068c9', opacity=0.5)
-        .encode(x='x:Q', y='y:Q'))
+        data = np.array( ['Gender','Age','Course','Year of Study','CGPA','Martial Status','Have depression?','Have any anxiety?','Had any panic attacks before?']).reshape(1,-1)
+
+        pred = get_prediction(data=data, model=model)
+
+        st.write(f"The predicted severity is:  {pred[0]}")
+
+if __name__ == '__main__':
+    main()
+
+
