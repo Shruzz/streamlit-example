@@ -13,7 +13,7 @@ from prediction import get_prediction, ordinal_encoder
 model = joblib.load(r'MentalHealth.ipynb')
 
 st.set_page_config(page_title="Students Mental Health Prediction App",
-                   , layout="wide")
+                   layout="wide")
 
 gender=['Male','Female']
 Age=['18.','19.','20.','21.','22.','23.','24,']
